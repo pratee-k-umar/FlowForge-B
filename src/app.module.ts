@@ -11,6 +11,7 @@ import { EmailModule } from './email/email.module';
 import { ApolloDriver } from '@nestjs/apollo';
 import { AppResolver } from './app.resolver';
 import { AuthResolver } from './auth/auth.resolver';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuthResolver } from './auth/auth.resolver';
     AuthModule,
     UserModule,
     EmailModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthResolver, AppResolver],

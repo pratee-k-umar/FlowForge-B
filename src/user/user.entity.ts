@@ -23,6 +23,7 @@ export class User {
   @Field()
   @Column({ default: false })
   isVerified: boolean;
+  projects: any;
 
   @BeforeInsert()
   async hashPassword() {
