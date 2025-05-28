@@ -3,19 +3,32 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './project.entity';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
+import { ProjectDetails } from './project-detail.entity';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(Project) private projectRepo: Repository<Project>,
+    @InjectRepository(ProjectDetails)
+    private detailsRepo: Repository<ProjectDetails>,
     private userService: UserService,
   ) {}
 
   async createProject(id: string, name: string): Promise<Project> {
     const user = await this.userService.findById(id);
-    if (!user) throw new NotFoundException('User not found!');
-    const project = await this.projectRepo.create({ name, owner: user });
-    return this.projectRepo.save(project);
+    if (!user) throw new NotFoundException('User not found');
+    const details = this.detailsRepo.create({
+      liveUrl: `https://your-domain.com/api/${/* placeholder */ ''}`,
+    });
+    const project = this.projectRepo.create({
+      name,
+      owner: user,
+      details,
+    });
+    const saved = await this.projectRepo.save(project);
+    saved.details.liveUrl = `https://your-domain.com/api/${saved.id}`;
+    await this.detailsRepo.save(saved.details);
+    return saved;
   }
 
   async findByUser(id: string): Promise<Project[]> {
@@ -23,5 +36,22 @@ export class ProjectService {
       where: { owner: { id: id } },
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async findById(projectId: string): Promise<Project> {
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+    });
+    if (!project) throw new NotFoundException('Project not found!');
+    return project;
+  }
+
+  async findByIdWithDetails(projectId: string): Promise<Project> {
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+      relations: ['details', 'owner'],
+    });
+    if (!project) throw new NotFoundException('Project not found!');
+    return project;
   }
 }

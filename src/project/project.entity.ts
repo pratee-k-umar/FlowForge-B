@@ -4,9 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ProjectDetails } from './project-detail.entity';
 
 @ObjectType()
 @Entity()
@@ -25,4 +28,9 @@ export class Project {
 
   @ManyToOne(() => User, (user) => user.projects, { onDelete: 'CASCADE' })
   owner: User;
+
+  @Field(() => ProjectDetails)
+  @OneToOne(() => ProjectDetails, { cascade: true })
+  @JoinColumn()
+  details: ProjectDetails;
 }

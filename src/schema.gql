@@ -10,10 +10,18 @@ type User {
   roles: [String!]!
 }
 
+type ProjectDetails {
+  id: ID!
+  dbType: String!
+  liveUrl: String!
+  design: JSON
+}
+
 type Project {
   id: ID!
   name: String!
   createdAt: DateTime!
+  details: ProjectDetails!
 }
 
 """
@@ -21,10 +29,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
 type Query {
   flowforge: String!
   me: User!
   projects: [Project!]!
+  getRecords(entity: String!): [JSON!]!
+  getRecord(entity: String!, id: String!): JSON!
 }
 
 type Mutation {
@@ -35,4 +50,7 @@ type Mutation {
   resetPassword(token: String!, newPassword: String!): String!
   protectedAction: String!
   createProject(name: String!): Project!
+  createRecord(entity: String!, data: JSON!): JSON!
+  updateRecord(entity: String!, id: String!, data: JSON!): JSON!
+  deleteRecord(entity: String!, id: String!): Boolean!
 }

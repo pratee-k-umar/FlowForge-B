@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -12,6 +12,8 @@ import { ApolloDriver } from '@nestjs/apollo';
 import { AppResolver } from './app.resolver';
 import { AuthResolver } from './auth/auth.resolver';
 import { ProjectModule } from './project/project.module';
+import { ProjectMiddleware } from './project/project.middleware';
+import GraphQLJSON from 'graphql-type-json';
 
 @Module({
   imports: [
@@ -22,6 +24,9 @@ import { ProjectModule } from './project/project.module';
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      buildSchemaOptions: {
+        scalarsMap: [{ type: Object, scalar: GraphQLJSON }],
+      },
       context: ({ req }) => ({ req }),
     }),
     TypeOrmModule.forRootAsync({
@@ -46,4 +51,11 @@ import { ProjectModule } from './project/project.module';
   controllers: [AppController],
   providers: [AppService, AuthResolver, AppResolver],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ProjectMiddleware).forRoutes({
+      path: 'api/:projectId/graphql',
+      method: RequestMethod.ALL,
+    });
+  }
+}
