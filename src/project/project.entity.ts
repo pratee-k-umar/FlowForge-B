@@ -6,10 +6,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProjectDetails } from './project-detail.entity';
+import { Resource } from './resource.entity';
 
 @ObjectType()
 @Entity()
@@ -33,4 +35,9 @@ export class Project {
   @OneToOne(() => ProjectDetails, { cascade: true })
   @JoinColumn()
   details: ProjectDetails;
+
+  @OneToMany(() => Resource, (r) => r.project, {
+    cascade: ['insert', 'update'],
+  })
+  resources: Resource[];
 }

@@ -9,15 +9,24 @@ import { DynamicResolver } from './dynamic.resolver';
 import { ProjectController } from './project.controller';
 import { ProjectDetails } from './project-detail.entity';
 import { DynamicRestController } from './dynamic-rest.controller';
+import { Resource } from './resource.entity';
+import { FieldDef } from './field-def.entity';
+import { ResourceService } from './resource.service';
 
 @Module({
   imports: [
     Project,
     ProjectDetails,
-    TypeOrmModule.forFeature([Project, ProjectDetails]),
+    TypeOrmModule.forFeature([Project, ProjectDetails, Resource, FieldDef]),
     UserModule,
   ],
-  providers: [ProjectService, ProjectResolver, DynamicService, DynamicResolver],
+  providers: [
+    ProjectService,
+    ProjectResolver,
+    DynamicService,
+    DynamicResolver,
+    ResourceService,
+  ],
   controllers: [ProjectController, DynamicRestController],
   exports: [ProjectService],
 })

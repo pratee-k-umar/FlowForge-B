@@ -1,70 +1,114 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { ProjectDetails } from './project-detail.entity';
+import { ResourceService } from './resource.service';
+import { Resource } from './resource.entity';
+import { FieldDef } from './field-def.entity';
 
 @Injectable()
 export class DynamicService {
-  constructor(private dataSource: DataSource) {}
+  constructor(
+    private readonly resourceService: ResourceService,
+    private readonly dataSource: DataSource,
+  ) {}
 
-  private getRepo(entityName: string, dbType: string): Repository<any> {
-    const metadata = this.dataSource.entityMetadatas.find(
-      (meta) => meta.tableName === entityName,
+  /** Helper: get the TypeORM repository for a given entity/table name */
+  private getRepo(entityName: string): Repository<any> {
+    const meta = this.dataSource.entityMetadatas.find(
+      (m) => m.tableName === entityName,
     );
-    if (!metadata) {
+    if (!meta) {
       throw new BadRequestException(
-        `Entity "${entityName}" not found in ${dbType}`,
+        `No table found for entity "${entityName}"`,
       );
     }
-    return this.dataSource.getRepository(metadata.name);
+    return this.dataSource.getRepository(meta.name);
   }
 
-  private validateEntity(projectDetails: ProjectDetails, entityName: string) {
-    if (!projectDetails.design.entities.includes(entityName)) {
-      throw new BadRequestException(
-        `Entity "${entityName}" not allowed for this project`,
-      );
-    }
-  }
-
-  async findAll(projectDetails: ProjectDetails, entityName: string) {
-    this.validateEntity(projectDetails, entityName);
-    const repo = this.getRepo(entityName, projectDetails.dbType);
+  /** List all records */
+  async findAll(projectId: string, entityName: string): Promise<any[]> {
+    const resource = await this.resourceService.findResource(
+      projectId,
+      entityName,
+    );
+    const repo = this.getRepo(resource.name);
     return repo.find();
   }
 
+  /** Fetch one record */
   async findOne(
-    projectDetails: ProjectDetails,
+    projectId: string,
     entityName: string,
     id: string,
-  ) {
-    this.validateEntity(projectDetails, entityName);
-    const repo = this.getRepo(entityName, projectDetails.dbType);
-    return repo.findOne({ where: { id } });
+  ): Promise<any> {
+    const resource = await this.resourceService.findResource(
+      projectId,
+      entityName,
+    );
+    const repo = this.getRepo(resource.name);
+    const record = await repo.findOne({ where: { id } });
+    if (!record) {
+      throw new NotFoundException(`${entityName} with id ${id} not found`);
+    }
+    return record;
   }
 
-  async create(projectDetails: ProjectDetails, entityName: string, data: any) {
-    this.validateEntity(projectDetails, entityName);
-    const repo = this.getRepo(entityName, projectDetails.dbType);
+  /** Create a new record */
+  async create(projectId: string, entityName: string, data: any): Promise<any> {
+    const resource = await this.resourceService.findResource(
+      projectId,
+      entityName,
+    );
+    // Validate required fields
+    for (const field of resource.fields) {
+      if (field.required && data[field.name] == null) {
+        throw new BadRequestException(`Field "${field.name}" is required`);
+      }
+    }
+    const repo = this.getRepo(resource.name);
     const entity = repo.create(data);
     return repo.save(entity);
   }
 
+  /** Update an existing record */
   async update(
-    projectDetails: ProjectDetails,
+    projectId: string,
     entityName: string,
     id: string,
     data: any,
-  ) {
-    this.validateEntity(projectDetails, entityName);
-    const repo = this.getRepo(entityName, projectDetails.dbType);
+  ): Promise<any> {
+    const resource = await this.resourceService.findResource(
+      projectId,
+      entityName,
+    );
+    // Optionally validate fields here
+    const repo = this.getRepo(resource.name);
     await repo.update(id, data);
-    return repo.findOne({ where: { id } });
+    const updated = await repo.findOne({ where: { id } });
+    if (!updated) {
+      throw new NotFoundException(`${entityName} with id ${id} not found`);
+    }
+    return updated;
   }
 
-  async delete(projectDetails: ProjectDetails, entityName: string, id: string) {
-    this.validateEntity(projectDetails, entityName);
-    const repo = this.getRepo(entityName, projectDetails.dbType);
-    await repo.delete(id);
-    return true;
+  /** Delete a record */
+  async delete(
+    projectId: string,
+    entityName: string,
+    id: string,
+  ): Promise<{ deleted: boolean }> {
+    const resource = await this.resourceService.findResource(
+      projectId,
+      entityName,
+    );
+    const repo = this.getRepo(resource.name);
+    const result = await repo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`${entityName} with id ${id} not found`);
+    }
+    return { deleted: true };
   }
 }
