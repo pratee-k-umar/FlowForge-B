@@ -7,9 +7,7 @@ A NestJS-based “codeless backend” platform that lets users:
   - **POST** runs the project-scoped GraphQL API  
 - Auto-generate **dynamic REST** CRUD endpoints per entity (`/api/:projectId/:entity`)  
 - Pick and connect a **cloud database** (MongoDB, Postgres, MySQL) via a single URI  
-- Define Entities & Fields (Resources & FieldDefs)—the system will `CREATE TABLE`/`CREATE COLLECTION`  
-
----
+- Define Entities & Fields (Resources & FieldDefs)—the system will `CREATE TABLE`/`CREATE COLLECTION`
 
 ## Features
 
@@ -17,13 +15,9 @@ A NestJS-based “codeless backend” platform that lets users:
 - **GraphQL** (code-first) for schema management & admin APIs  
 - **REST** for user-friendly CRUD on any defined “collection”  
 - **Dynamic provisioning**: spins up schemas on user’s cloud DB  
-- JWT **authentication** + role-based guards  
-
----
+- JWT **authentication** + role-based guards
 
 Here’s a **detailed, clean, and professional README** for your **FlowForge Backend**. You can directly use it as `README.md` in your backend repo! 🚀
-
----
 
 ## 📂 Folder Structure
 
@@ -41,8 +35,6 @@ src/
 ├── user/                    # User module & service
 └── app.module.ts
 ```
-
----
 
 ## 🚀 Getting Started
 
@@ -76,8 +68,6 @@ npm run typeorm migration:run
 ```bash
 npm run start:dev
 ```
-
----
 
 ## 🌐 API Overview
 
@@ -133,8 +123,6 @@ npm run start:dev
   }
   ```
 
----
-
 ## 🏗️ How It Works
 
 1. **Create Project** – via GraphQL or REST.
@@ -149,8 +137,6 @@ npm run start:dev
    http://localhost:4000/api/<projectId>/<entity>
    ```
 
----
-
 ## ⚙️ Tech Stack
 
 * **NestJS** – scalable Node.js framework
@@ -159,16 +145,12 @@ npm run start:dev
 * **MongoDB / Postgres / MySQL** – cloud DB support (Atlas, Neon, PlanetScale)
 * **JWT Auth & Role-Based Access** – secure multi-tenant support
 
----
-
 ## 🛠️ Future Plans
 
 * 🌈 **Schema Designer UI** – drag-and-drop entity & field definitions.
 * 🔄 **Real-time Collaboration** – live updates with WebSockets.
 * 📈 **Analytics & Monitoring** – API usage metrics per project.
 * 🏷️ **Custom Domains & Webhooks** – advanced developer tools.
-
----
 
 ## 🚨 Dev Tips
 
