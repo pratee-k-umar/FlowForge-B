@@ -12,7 +12,6 @@ type User {
 
 type ProjectDetails {
   id: ID!
-  dbType: String!
   liveUrl: String!
   design: JSON
 }
@@ -50,7 +49,21 @@ type Mutation {
   resetPassword(token: String!, newPassword: String!): String!
   protectedAction: String!
   createProject(name: String!): Project!
+  setDatabaseConfig(projectId: String!, config: DatabaseConfigInput!): Project!
   createRecord(entity: String!, data: JSON!): JSON!
   updateRecord(entity: String!, id: String!, data: JSON!): JSON!
   deleteRecord(entity: String!, id: String!): Boolean!
+}
+
+input DatabaseConfigInput {
+  dbType: DbType!
+
+  """Full connection URI to your cloud database"""
+  connectionUri: String!
+}
+
+enum DbType {
+  MONGO
+  POSTGRES
+  MYSQL
 }

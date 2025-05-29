@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FieldDef } from './field-def.entity';
@@ -11,6 +16,7 @@ export class ResourceService {
     @InjectRepository(Resource) private readonly resRepo: Repository<Resource>,
     @InjectRepository(FieldDef)
     private readonly fieldRepo: Repository<FieldDef>,
+    @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService,
   ) {}
 

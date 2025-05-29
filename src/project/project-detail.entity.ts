@@ -16,9 +16,11 @@ export class ProjectDetails {
   @Field(() => ID)
   id: string;
 
-  @Field()
   @Column({ nullable: true })
-  dbType?: string;
+  dbType?: 'mongo' | 'postgres' | 'mysql';
+
+  @Column({ nullable: true })
+  connectionUri?: string;
 
   @Field()
   @Column()

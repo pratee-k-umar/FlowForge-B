@@ -55,11 +55,16 @@ export class DynamicResolver {
   @Mutation(() => Boolean, { name: 'deleteRecord' })
   @UseGuards(GqlJwtGaurd)
   async deleteRecord(
-    @Args('entity', { type: () => String }) entity: string,
-    @Args('id', { type: () => String }) id: string,
+    @Args('entity') entity: string,
+    @Args('id') id: string,
     @Context() { req },
   ): Promise<boolean> {
-    const { projectDetails } = req as any;
-    return this.dynamicService.delete(projectDetails, entity, id);
+    const projectDetails = (req as any).projectDetails;
+    const { deleted } = await this.dynamicService.delete(
+      projectDetails,
+      entity,
+      id,
+    );
+    return deleted;
   }
 }

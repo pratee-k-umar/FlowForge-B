@@ -12,6 +12,7 @@ import { DynamicRestController } from './dynamic-rest.controller';
 import { Resource } from './resource.entity';
 import { FieldDef } from './field-def.entity';
 import { ResourceService } from './resource.service';
+import { SchemaService } from './schema.service';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ResourceService } from './resource.service';
     DynamicService,
     DynamicResolver,
     ResourceService,
+    SchemaService,
   ],
   controllers: [ProjectController, DynamicRestController],
   exports: [ProjectService],
