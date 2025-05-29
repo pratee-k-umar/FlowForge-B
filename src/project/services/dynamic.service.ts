@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { ResourceService } from './resource.service';
-import { Resource } from './resource.entity';
-import { FieldDef } from './field-def.entity';
+import { Resource } from '../entities/resource.entity';
+import { FieldDef } from '../entities/field-def.entity';
 
 @Injectable()
 export class DynamicService {

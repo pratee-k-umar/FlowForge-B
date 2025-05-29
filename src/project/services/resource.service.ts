@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FieldDef } from './field-def.entity';
-import { ProjectService } from './project.service';
-import { Resource } from './resource.entity';
+import { FieldDef } from '../entities/field-def.entity';
+import { ProjectService } from '../project.service';
+import { Resource } from '../entities/resource.entity';
 
 @Injectable()
 export class ResourceService {

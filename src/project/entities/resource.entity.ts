@@ -6,7 +6,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Project } from './project.entity';
+import { Project } from '../project.entity';
 import { FieldDef } from './field-def.entity';
 
 @ObjectType()

@@ -6,7 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Project } from './project.entity';
+import { Project } from '../project.entity';
 import GraphQLJSON from 'graphql-type-json';
 
 @ObjectType()

@@ -4,15 +4,15 @@ import { UserModule } from 'src/user/user.module';
 import { ProjectService } from './project.service';
 import { ProjectResolver } from './project.resolver';
 import { Project } from './project.entity';
-import { DynamicService } from './dynamic.service';
-import { DynamicResolver } from './dynamic.resolver';
+import { DynamicService } from './services/dynamic.service';
+import { DynamicResolver } from './resolver/dynamic.resolver';
 import { ProjectController } from './project.controller';
-import { ProjectDetails } from './project-detail.entity';
-import { DynamicRestController } from './dynamic-rest.controller';
-import { Resource } from './resource.entity';
-import { FieldDef } from './field-def.entity';
-import { ResourceService } from './resource.service';
-import { SchemaService } from './schema.service';
+import { ProjectDetails } from './entities/project-detail.entity';
+import { DynamicRestController } from './controller/dynamic-rest.controller';
+import { Resource } from './entities/resource.entity';
+import { FieldDef } from './entities/field-def.entity';
+import { ResourceService } from './services/resource.service';
+import { SchemaService } from './services/schema.service';
 
 @Module({
   imports: [

@@ -10,8 +10,8 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ProjectDetails } from './project-detail.entity';
-import { Resource } from './resource.entity';
+import { ProjectDetails } from './entities/project-detail.entity';
+import { Resource } from './entities/resource.entity';
 
 @ObjectType()
 @Entity()

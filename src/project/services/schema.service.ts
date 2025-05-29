@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { MongoClient } from 'mongodb';
-import { ProjectService } from './project.service';
+import { ProjectService } from '../project.service';
 import { ResourceService } from './resource.service';
 
 @Injectable()

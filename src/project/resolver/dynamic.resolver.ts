@@ -1,5 +1,5 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { DynamicService } from './dynamic.service';
+import { DynamicService } from '../services/dynamic.service';
 import { UseGuards } from '@nestjs/common';
 import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
 import { GraphQLJSON } from 'graphql-type-json';
