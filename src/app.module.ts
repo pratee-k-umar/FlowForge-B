@@ -34,8 +34,11 @@ import GraphQLJSON from 'graphql-type-json';
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
         type: 'postgres',
-        url: cfg.get<string>('DB_URL'),
-        autoLoadEntities: true,
+        host: cfg.get<string>('DB_HOST'),
+        port: +cfg.get<number>('DB_PORT'),
+        username: cfg.get('DB_USER'),
+        password: cfg.get('DB_PASS'),
+        database: cfg.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),
