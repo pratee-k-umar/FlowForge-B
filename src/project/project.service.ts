@@ -18,7 +18,7 @@ export class ProjectService {
     const user = await this.userService.findById(id);
     if (!user) throw new NotFoundException('User not found');
     const details = this.detailsRepo.create({
-      liveUrl: `https://your-domain.com/api/${/* placeholder */ ''}`,
+      liveUrl: `/api/placeholder/graphql`,
     });
     const project = this.projectRepo.create({
       name,
@@ -26,7 +26,7 @@ export class ProjectService {
       details,
     });
     const saved = await this.projectRepo.save(project);
-    saved.details.liveUrl = `https://your-domain.com/api/${saved.id}`;
+    saved.details.liveUrl = `/api/${saved.id}/graphql`;
     await this.detailsRepo.save(saved.details);
     return saved;
   }

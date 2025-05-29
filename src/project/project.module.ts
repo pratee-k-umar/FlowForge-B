@@ -8,6 +8,7 @@ import { DynamicService } from './dynamic.service';
 import { DynamicResolver } from './dynamic.resolver';
 import { ProjectController } from './project.controller';
 import { ProjectDetails } from './project-detail.entity';
+import { DynamicRestController } from './dynamic-rest.controller';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { ProjectDetails } from './project-detail.entity';
     UserModule,
   ],
   providers: [ProjectService, ProjectResolver, DynamicService, DynamicResolver],
-  controllers: [ProjectController],
+  controllers: [ProjectController, DynamicRestController],
   exports: [ProjectService],
 })
 export class ProjectModule {}

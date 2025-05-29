@@ -1,8 +1,8 @@
-import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Project } from "./project.entity";
-import { ProjectService } from "./project.service";
-import { UseGuards } from "@nestjs/common";
-import { GqlJwtGaurd } from "src/auth/gql-jwt.gaurd";
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Project } from './project.entity';
+import { ProjectService } from './project.service';
+import { UseGuards } from '@nestjs/common';
+import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -18,7 +18,7 @@ export class ProjectResolver {
   @UseGuards(GqlJwtGaurd)
   async createProject(
     @Args('name') name: string,
-    @Context() { req }
+    @Context() { req },
   ): Promise<Project> {
     return this.projectService.createProject(req.user.id, name);
   }
