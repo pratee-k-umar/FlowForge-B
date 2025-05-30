@@ -17,7 +17,7 @@ A NestJS-based “codeless backend” platform that lets users:
 - **Dynamic provisioning**: spins up schemas on user’s cloud DB  
 - JWT **authentication** + role-based guards
 
-## 📂 Folder Structure
+## Folder Structure
 
 ```
 src/
@@ -34,9 +34,9 @@ src/
 └── app.module.ts
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
-### 1️⃣ Clone & Install
+### 1 Clone & Install
 
 ```bash
 git clone https://github.com/your-repo/flowforge-backend.git
@@ -44,7 +44,7 @@ cd flowforge-backend
 npm install
 ```
 
-### 2️⃣ Configure `.env`
+### 2 Configure `.env`
 
 ```dotenv
 PORT=4000
@@ -53,7 +53,7 @@ JWT_SECRET=your_jwt_secret
 BASE_URL=http://localhost:4000
 ```
 
-### 3️⃣ Run Migrations (if using Postgres/MySQL)
+### 3 Run Migrations (if using Postgres/MySQL)
 
 Or set `synchronize: true` in `ormconfig` for development.
 
@@ -61,20 +61,20 @@ Or set `synchronize: true` in `ormconfig` for development.
 npm run typeorm migration:run
 ```
 
-### 4️⃣ Start the Server
+### 4 Start the Server
 
 ```bash
 npm run start:dev
 ```
 
-## 🌐 API Overview
+## API Overview
 
-### 🔑 Authentication
+### Authentication
 
 * JWT-based with optional role checks.
 * Protected routes use `@UseGuards(GqlJwtAuthGuard)` or REST middleware.
 
-### 📡 Endpoints
+### Endpoints
 
 #### **GraphQL**
 
@@ -121,7 +121,7 @@ npm run start:dev
   }
   ```
 
-## 🏗️ How It Works
+## How It Works
 
 1. **Create Project** – via GraphQL or REST.
 2. **Configure Database** – connect your cloud DB with a single connection URI.
@@ -135,7 +135,7 @@ npm run start:dev
    http://localhost:4000/api/<projectId>/<entity>
    ```
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 * **NestJS** – scalable Node.js framework
 * **TypeORM** – flexible ORM supporting multiple databases
@@ -143,14 +143,14 @@ npm run start:dev
 * **MongoDB / Postgres / MySQL** – cloud DB support (Atlas, Neon, PlanetScale)
 * **JWT Auth & Role-Based Access** – secure multi-tenant support
 
-## 🛠️ Future Plans
+## Future Plans
 
-* 🌈 **Schema Designer UI** – drag-and-drop entity & field definitions.
-* 🔄 **Real-time Collaboration** – live updates with WebSockets.
-* 📈 **Analytics & Monitoring** – API usage metrics per project.
-* 🏷️ **Custom Domains & Webhooks** – advanced developer tools.
+* **Schema Designer UI** – drag-and-drop entity & field definitions.
+* **Real-time Collaboration** – live updates with WebSockets.
+* **Analytics & Monitoring** – API usage metrics per project.
+* **Custom Domains & Webhooks** – advanced developer tools.
 
-## 🚨 Dev Tips
+## Dev Tips
 
 * Use **GraphQL Playground** to explore:
   `http://localhost:4000/api/<projectId>/graphql`
