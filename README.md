@@ -17,8 +17,6 @@ A NestJS-based “codeless backend” platform that lets users:
 - **Dynamic provisioning**: spins up schemas on user’s cloud DB  
 - JWT **authentication** + role-based guards
 
-Here’s a **detailed, clean, and professional README** for your **FlowForge Backend**. You can directly use it as `README.md` in your backend repo! 🚀
-
 ## 📂 Folder Structure
 
 ```
