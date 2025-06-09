@@ -1,12 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Project } from '../project.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import GraphQLJSON from 'graphql-type-json';
 
 @ObjectType()

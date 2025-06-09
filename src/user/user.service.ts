@@ -19,9 +19,9 @@ export class UserService {
   findById(id: string) {
     return this.repo.findOne({ where: { id } });
   }
-  
+
   markVerified(id: string) {
-    return this.repo.update(id, { isVerified: true })
+    return this.repo.update(id, { isVerified: true });
   }
 
   updatePassword(id: string, password: string) {

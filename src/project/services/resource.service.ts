@@ -28,11 +28,7 @@ export class ResourceService {
   ): Promise<Resource> {
     const project = await this.projectService.findById(projectId);
     if (!project) throw new NotFoundException('Project not found');
-
-    // Build the route path
     const route = `/api/${projectId}/${name}`;
-
-    // Create field definitions
     const fields = fieldDefs.map((fd) =>
       this.fieldRepo.create({
         name: fd.name,
@@ -40,12 +36,9 @@ export class ResourceService {
         required: !!fd.required,
       }),
     );
-
-    // Create & save Resource with its fields
     const resource = this.resRepo.create({ name, route, project, fields });
     return this.resRepo.save(resource);
   }
-
   /** List all resources (collections) for a project */
   async listResources(projectId: string): Promise<Resource[]> {
     return this.resRepo.find({
@@ -53,7 +46,6 @@ export class ResourceService {
       relations: ['fields'],
     });
   }
-
   /** Fetch one resource by name */
   async findResource(projectId: string, name: string): Promise<Resource> {
     const res = await this.resRepo.findOne({

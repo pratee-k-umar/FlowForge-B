@@ -26,10 +26,8 @@ export class SchemaService {
         await client.connect();
         this.mongoClients.set(projectId, client);
       }
-      return this.mongoClients.get(projectId).db(); // default DB in URI
+      return this.mongoClients.get(projectId).db();
     }
-
-    // Postgres or MySQL
     if (!this.sqlDataSources.has(projectId)) {
       const ds = new DataSource({
         type: details.dbType,
@@ -49,10 +47,9 @@ export class SchemaService {
 
     for (const r of resources) {
       const name = r.name;
-      const fields = r.fields; // array of FieldDef
+      const fields = r.fields;
 
       if (conn instanceof DataSource) {
-        // SQL
         const qr = conn.createQueryRunner();
         const cols = fields
           .map(
@@ -65,8 +62,7 @@ export class SchemaService {
         );
         await qr.release();
       } else {
-        // MongoDB
-        const db = conn; // MongoDB Database
+        const db = conn;
         const exists = await db.listCollections({ name }).toArray();
         if (!exists.length) await db.createCollection(name);
       }

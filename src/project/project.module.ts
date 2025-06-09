@@ -6,7 +6,6 @@ import { ProjectResolver } from './project.resolver';
 import { Project } from './project.entity';
 import { DynamicService } from './services/dynamic.service';
 import { DynamicResolver } from './resolver/dynamic.resolver';
-import { ProjectController } from './project.controller';
 import { ProjectDetails } from './entities/project-detail.entity';
 import { DynamicRestController } from './controller/dynamic-rest.controller';
 import { Resource } from './entities/resource.entity';
@@ -29,7 +28,7 @@ import { SchemaService } from './services/schema.service';
     ResourceService,
     SchemaService,
   ],
-  controllers: [ProjectController, DynamicRestController],
+  controllers: [DynamicRestController],
   exports: [ProjectService],
 })
 export class ProjectModule {}
