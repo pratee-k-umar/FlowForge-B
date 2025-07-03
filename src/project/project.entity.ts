@@ -6,12 +6,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProjectDetails } from './entities/project-detail.entity';
-import { Resource } from './entities/resource.entity';
 
 @ObjectType()
 @Entity()
@@ -32,12 +30,12 @@ export class Project {
   owner: User;
 
   @Field(() => ProjectDetails)
-  @OneToOne(() => ProjectDetails, { cascade: true })
+  @OneToOne(() => ProjectDetails, { cascade: true, eager: true })
   @JoinColumn()
   details: ProjectDetails;
 
-  @OneToMany(() => Resource, (r) => r.project, {
-    cascade: ['insert', 'update'],
-  })
-  resources: Resource[];
+  // @OneToMany(() => Resource, (r) => r.project, {
+  //   cascade: ['insert', 'update'],
+  // })
+  // resources: Resource[];
 }

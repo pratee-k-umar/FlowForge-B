@@ -1,6 +1,12 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import GraphQLJSON from 'graphql-type-json';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Schema } from './schema.entity';
 
 @ObjectType()
 @Entity()
@@ -9,9 +15,11 @@ export class ProjectDetails {
   @Field(() => ID)
   id: string;
 
+  @Field({ nullable: true })
   @Column({ nullable: true })
   dbType?: 'mongo' | 'postgres' | 'mysql';
 
+  @Field({ nullable: true })
   @Column({ nullable: true })
   connectionUri?: string;
 
@@ -19,9 +27,10 @@ export class ProjectDetails {
   @Column()
   liveUrl: string;
 
-  @Field(() => GraphQLJSON, { nullable: true })
-  @Column('jsonb', { nullable: true })
-  design?: any;
+  @Field(() => [Schema])
+  @OneToMany(() => Schema, (schema) => schema.projectDetail)
+  @JoinColumn()
+  design?: Schema[];
 
   // @OneToOne(() => Project, (p) => p.details, { onDelete: 'CASCADE' })
   // @JoinColumn()

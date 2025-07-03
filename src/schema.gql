@@ -12,8 +12,17 @@ type User {
 
 type ProjectDetails {
   id: ID!
+  dbType: String
+  connectionUri: String
   liveUrl: String!
-  design: JSON
+  design: String
+}
+
+type FieldDef {
+  id: ID!
+  name: String!
+  type: String!
+  required: Boolean!
 }
 
 type Project {
@@ -50,9 +59,11 @@ type Mutation {
   protectedAction: String!
   createProject(name: String!): Project!
   setDatabaseConfig(projectId: String!, config: DatabaseConfigInput!): Project!
+  createDesign(projectId: String!, design: JSON!): ProjectDetails!
   createRecord(entity: String!, data: JSON!): JSON!
   updateRecord(entity: String!, id: String!, data: JSON!): JSON!
   deleteRecord(entity: String!, id: String!): Boolean!
+  addField(resourceId: String!, name: String!, type: String!, required: Boolean! = false, referenceResourceId: String): FieldDef!
 }
 
 input DatabaseConfigInput {

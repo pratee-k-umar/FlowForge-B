@@ -1,9 +1,19 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  Resolver,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { Project } from './project.entity';
 import { ProjectService } from './project.service';
 import { UseGuards } from '@nestjs/common';
 import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
 import { DatabaseConfigInput, DbType } from './dto/database-config.input';
+import { ProjectDetails } from './entities/project-detail.entity';
+import GraphQLJSON from 'graphql-type-json';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -11,7 +21,7 @@ export class ProjectResolver {
 
   @Query(() => [Project], { name: 'projects' })
   @UseGuards(GqlJwtGaurd)
-  async getMyProjects(@Context() { req }): Promise<Project[]> {
+  async projects(@Context() { req }): Promise<Project[]> {
     return this.projectService.findByUser(req.user.id);
   }
 
@@ -37,5 +47,20 @@ export class ProjectResolver {
       config.dbType as DbType,
       config.connectionUri,
     );
+  }
+
+  @Mutation(() => ProjectDetails, { name: 'createDesign' })
+  @UseGuards(GqlJwtGaurd)
+  createDesign(
+    @Args('projectId') projectId: string,
+    @Args('design', { type: () => GraphQLJSON }) design: any,
+    @Context() { req },
+  ): Promise<ProjectDetails> {
+    return this.projectService.createDesign(req.user.id, projectId, design);
+  }
+
+  @ResolveField('details', () => ProjectDetails)
+  async getDetails(@Parent() project: Project): Promise<ProjectDetails> {
+    return this.projectService.getProjectDetails(project.id);
   }
 }

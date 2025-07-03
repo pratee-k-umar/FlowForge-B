@@ -4,12 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { ResourceService } from './resource.service';
+import { SchemaService } from './schema.service';
 
 @Injectable()
 export class DynamicService {
   constructor(
-    private readonly resourceService: ResourceService,
+    private readonly schemaService: SchemaService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -28,7 +28,7 @@ export class DynamicService {
 
   /** List all records */
   async findAll(projectId: string, entityName: string): Promise<any[]> {
-    const resource = await this.resourceService.findResource(
+    const resource = await this.schemaService.findResource(
       projectId,
       entityName,
     );
@@ -42,7 +42,7 @@ export class DynamicService {
     entityName: string,
     id: string,
   ): Promise<any> {
-    const resource = await this.resourceService.findResource(
+    const resource = await this.schemaService.findResource(
       projectId,
       entityName,
     );
@@ -56,7 +56,7 @@ export class DynamicService {
 
   /** Create a new record */
   async create(projectId: string, entityName: string, data: any): Promise<any> {
-    const resource = await this.resourceService.findResource(
+    const resource = await this.schemaService.findResource(
       projectId,
       entityName,
     );
@@ -78,7 +78,7 @@ export class DynamicService {
     id: string,
     data: any,
   ): Promise<any> {
-    const resource = await this.resourceService.findResource(
+    const resource = await this.schemaService.findResource(
       projectId,
       entityName,
     );
@@ -98,7 +98,7 @@ export class DynamicService {
     entityName: string,
     id: string,
   ): Promise<{ deleted: boolean }> {
-    const resource = await this.resourceService.findResource(
+    const resource = await this.schemaService.findResource(
       projectId,
       entityName,
     );
