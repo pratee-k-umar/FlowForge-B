@@ -20,5 +20,4 @@ import 'dotenv/config';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
-
 export class AuthModule {}

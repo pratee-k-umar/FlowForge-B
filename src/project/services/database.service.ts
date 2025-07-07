@@ -49,7 +49,7 @@ export class DatabaseService {
     // load schemas and their columns
     const tables = await this.tableRepo.find({
       where: { projectDetail: { id: details.id } },
-      relations: ['columns'],
+      relations: ['fields'],
     });
 
     for (const tbl of tables) {

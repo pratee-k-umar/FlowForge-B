@@ -9,7 +9,7 @@ import {
 import { Schema } from './schema.entity';
 
 @ObjectType()
-@Entity()
+@Entity({ name: 'project_details' })
 export class ProjectDetails {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)

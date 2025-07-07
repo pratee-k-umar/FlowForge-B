@@ -11,23 +11,24 @@ import { DynamicRestController } from './controller/dynamic-rest.controller';
 import { SchemaService } from './services/schema.service';
 import { DatabaseService } from './services/database.service';
 import { Schema } from './entities/schema.entity';
-import { ProjectDetailsResolver } from './resolver/project-details.resolver';
+import { ResourceService } from './services/resource.service';
+import { Fields } from './entities/fields.entity';
 
 @Module({
   imports: [
     Project,
     ProjectDetails,
-    TypeOrmModule.forFeature([Project, ProjectDetails, Schema]),
+    TypeOrmModule.forFeature([Project, ProjectDetails, Schema, Fields]),
     UserModule,
   ],
   providers: [
     ProjectService,
     ProjectResolver,
-    ProjectDetailsResolver,
     DynamicService,
     DynamicResolver,
     SchemaService,
     DatabaseService,
+    ResourceService,
   ],
   controllers: [DynamicRestController],
   exports: [ProjectService],

@@ -1,12 +1,4 @@
-import {
-  Args,
-  Context,
-  Mutation,
-  Query,
-  Resolver,
-  ResolveField,
-  Parent,
-} from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Project } from './project.entity';
 import { ProjectService } from './project.service';
 import { UseGuards } from '@nestjs/common';
@@ -59,8 +51,8 @@ export class ProjectResolver {
     return this.projectService.createDesign(req.user.id, projectId, design);
   }
 
-  @ResolveField('details', () => ProjectDetails)
-  async getDetails(@Parent() project: Project): Promise<ProjectDetails> {
-    return this.projectService.getProjectDetails(project.id);
-  }
+  // @ResolveField('details', () => ProjectDetails)
+  // async getDetails(@Parent() project: Project): Promise<ProjectDetails> {
+  //   return this.projectService.getProjectDetails(project.id);
+  // }
 }

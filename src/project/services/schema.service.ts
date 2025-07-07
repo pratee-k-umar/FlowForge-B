@@ -1,4 +1,3 @@
-// src/project/resource.service.ts
 import {
   Injectable,
   NotFoundException,

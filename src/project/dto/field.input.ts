@@ -1,7 +1,7 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
 
 @InputType()
-export class CreateColumnSchemaInput {
+export class Fields {
   @Field(() => ID)
   id: string;
 

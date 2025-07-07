@@ -12,7 +12,7 @@ export class UserResolver {
   @UseGuards(GqlJwtGaurd)
   async me(@Context() { req }): Promise<User> {
     const userId = req.user.id;
-    const user = await this.users.findById(userId)
+    const user = await this.users.findById(userId);
     if (!user) throw new UnauthorizedException();
     return user;
   }

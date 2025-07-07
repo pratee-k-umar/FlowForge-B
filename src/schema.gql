@@ -10,19 +10,28 @@ type User {
   roles: [String!]!
 }
 
+type Fields {
+  id: ID!
+  name: String!
+  type: String!
+  isRequired: Boolean!
+  schemaId: ID!
+  referencesSchemaId: String
+  referencesField: String
+}
+
+type Schema {
+  id: ID!
+  name: String!
+  fields: [Fields!]!
+}
+
 type ProjectDetails {
   id: ID!
   dbType: String
   connectionUri: String
   liveUrl: String!
-  design: String
-}
-
-type FieldDef {
-  id: ID!
-  name: String!
-  type: String!
-  required: Boolean!
+  design: [Schema!]!
 }
 
 type Project {
@@ -63,7 +72,6 @@ type Mutation {
   createRecord(entity: String!, data: JSON!): JSON!
   updateRecord(entity: String!, id: String!, data: JSON!): JSON!
   deleteRecord(entity: String!, id: String!): Boolean!
-  addField(resourceId: String!, name: String!, type: String!, required: Boolean! = false, referenceResourceId: String): FieldDef!
 }
 
 input DatabaseConfigInput {
