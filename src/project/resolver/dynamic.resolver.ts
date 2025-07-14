@@ -1,4 +1,4 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { DynamicService } from '../services/dynamic.service';
 import { UseGuards } from '@nestjs/common';
 import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
@@ -11,60 +11,51 @@ export class DynamicResolver {
   @Query(() => [GraphQLJSON], { name: 'getRecords' })
   @UseGuards(GqlJwtGaurd)
   async getRecords(
+    @Args('projectId', { type: () => ID }) projectId: string,
     @Args('entity', { type: () => String }) entity: string,
-    @Context() { req },
   ) {
-    const { projectDetails } = req as any;
-    return this.dynamicService.findAll(projectDetails, entity);
+    return this.dynamicService.findAll(projectId, entity);
   }
 
   @Query(() => GraphQLJSON, { name: 'getRecord' })
   @UseGuards(GqlJwtGaurd)
   async getRecord(
+    @Args('projectId', { type: () => ID }) projectId: string,
     @Args('entity', { type: () => String }) entity: string,
     @Args('id', { type: () => String }) id: string,
-    @Context() { req },
   ): Promise<any> {
-    const { projectDetails } = req as any;
-    return this.dynamicService.findOne(projectDetails, entity, id);
+    return this.dynamicService.findOne(projectId, entity, id);
   }
 
   @Mutation(() => GraphQLJSON, { name: 'createRecord' })
   @UseGuards(GqlJwtGaurd)
   async createRecord(
+    @Args('projectId', { type: () => ID }) projectId: string,
     @Args('entity', { type: () => String }) entity: string,
     @Args('data', { type: () => GraphQLJSON }) data: any,
-    @Context() { req },
   ): Promise<any> {
-    const { projectDetails } = req as any;
-    return this.dynamicService.create(projectDetails, entity, data);
+    return this.dynamicService.create(projectId, entity, data);
   }
 
   @Mutation(() => GraphQLJSON, { name: 'updateRecord' })
   @UseGuards(GqlJwtGaurd)
   async updateRecord(
+    @Args('projectId', { type: () => ID }) projectId: string,
     @Args('entity', { type: () => String }) entity: string,
     @Args('id', { type: () => String }) id: string,
     @Args('data', { type: () => GraphQLJSON }) data: any,
-    @Context() { req },
   ): Promise<any> {
-    const { projectDetails } = req as any;
-    return this.dynamicService.update(projectDetails, entity, id, data);
+    return this.dynamicService.update(projectId, entity, id, data);
   }
 
   @Mutation(() => Boolean, { name: 'deleteRecord' })
   @UseGuards(GqlJwtGaurd)
   async deleteRecord(
+    @Args('projectId', { type: () => ID }) projectId: string,
     @Args('entity') entity: string,
     @Args('id') id: string,
-    @Context() { req },
   ): Promise<boolean> {
-    const projectDetails = (req as any).projectDetails;
-    const { deleted } = await this.dynamicService.delete(
-      projectDetails,
-      entity,
-      id,
-    );
+    const { deleted } = await this.dynamicService.delete(projectId, entity, id);
     return deleted;
   }
 }

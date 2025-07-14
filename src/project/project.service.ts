@@ -59,7 +59,12 @@ export class ProjectService {
   async findByIdWithDetails(projectId: string): Promise<Project> {
     const project = await this.projectRepo.findOne({
       where: { id: projectId },
-      relations: ['details', 'owner'],
+      relations: [
+        'details',
+        'owner',
+        'details.design',
+        'details.design.fields',
+      ],
     });
     if (!project) throw new NotFoundException('Project not found!');
     return project;
@@ -103,7 +108,12 @@ export class ProjectService {
   ): Promise<ProjectDetails> {
     const project = await this.projectRepo.findOne({
       where: { id: projectId },
-      relations: ['owner', 'details', 'details.fields'],
+      relations: [
+        'owner',
+        'details',
+        'details.design',
+        'details.design.fields',
+      ],
     });
     if (!project) throw new NotFoundException('Project not found');
     if (project.owner.id !== userId) throw new ForbiddenException();
@@ -113,7 +123,9 @@ export class ProjectService {
       throw new NotFoundException('Project details not found');
     }
 
-    if (details.design) {
+    if (details.design && details.design.length > 0) {
+      const fieldsToRemove = details.design.flatMap((s) => s.fields || []);
+      await this.fieldRepo.remove(fieldsToRemove);
       await this.schemaRepo.remove(details.design);
     }
 

@@ -60,14 +60,24 @@ export class DynamicService {
       projectId,
       entityName,
     );
+
+    const validFieldNames = new Set(resource.fields.map((f) => f.name));
+    const validData = {};
+
     // Validate required fields
     for (const field of resource.fields) {
-      if (field.required && data[field.name] == null) {
+      if (field.isRequired && data[field.name] == null) {
         throw new BadRequestException(`Field "${field.name}" is required`);
       }
     }
+
+    for (const key of Object.keys(data)) {
+      if (validFieldNames.has(key)) {
+        validData[key] = data[key];
+      }
+    }
     const repo = this.getRepo(resource.name);
-    const entity = repo.create(data);
+    const entity = repo.create(validData);
     return repo.save(entity);
   }
 
@@ -82,9 +92,22 @@ export class DynamicService {
       projectId,
       entityName,
     );
-    // Optionally validate fields here
+
+    const validFieldNames = new Set(resource.fields.map((f) => f.name));
+    const validData = {};
+    for (const key of Object.keys(data)) {
+      if (validFieldNames.has(key) && data[key] !== undefined) {
+        validData[key] = data[key];
+      }
+    }
+
+    if (Object.keys(validData).length === 0) {
+      throw new BadRequestException(
+        'Update data contains no valid fields for this entity or all values are undefined.',
+      );
+    }
     const repo = this.getRepo(resource.name);
-    await repo.update(id, data);
+    await repo.update(id, validData);
     const updated = await repo.findOne({ where: { id } });
     if (!updated) {
       throw new NotFoundException(`${entityName} with id ${id} not found`);

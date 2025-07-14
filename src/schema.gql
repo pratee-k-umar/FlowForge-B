@@ -15,7 +15,6 @@ type Fields {
   name: String!
   type: String!
   isRequired: Boolean!
-  schemaId: ID!
   referencesSchemaId: String
   referencesField: String
 }
@@ -55,8 +54,8 @@ type Query {
   flowforge: String!
   me: User!
   projects: [Project!]!
-  getRecords(entity: String!): [JSON!]!
-  getRecord(entity: String!, id: String!): JSON!
+  getRecords(projectId: ID!, entity: String!): [JSON!]!
+  getRecord(projectId: ID!, entity: String!, id: String!): JSON!
 }
 
 type Mutation {
@@ -69,9 +68,11 @@ type Mutation {
   createProject(name: String!): Project!
   setDatabaseConfig(projectId: String!, config: DatabaseConfigInput!): Project!
   createDesign(projectId: String!, design: JSON!): ProjectDetails!
-  createRecord(entity: String!, data: JSON!): JSON!
-  updateRecord(entity: String!, id: String!, data: JSON!): JSON!
-  deleteRecord(entity: String!, id: String!): Boolean!
+  createRecord(projectId: ID!, entity: String!, data: JSON!): JSON!
+  updateRecord(projectId: ID!, entity: String!, id: String!, data: JSON!): JSON!
+  deleteRecord(projectId: ID!, entity: String!, id: String!): Boolean!
+  createSchema(projectId: ID!, name: String!): Schema!
+  addField(projectId: ID!, schemaId: ID!, field: FieldCRUDInput!): Fields!
 }
 
 input DatabaseConfigInput {
@@ -85,4 +86,13 @@ enum DbType {
   MONGO
   POSTGRES
   MYSQL
+}
+
+input FieldCRUDInput {
+  id: ID!
+  name: String!
+  type: String!
+  isRequired: Boolean = false
+  referencesSchemaId: ID
+  referencesField: String
 }

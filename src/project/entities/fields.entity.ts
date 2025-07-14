@@ -31,10 +31,6 @@ export class Fields {
   @JoinColumn({ name: 'tableSchemaId' })
   schema: Schema;
 
-  @Field(() => ID)
-  @Column()
-  schemaId: string;
-
   @Field({ nullable: true })
   @Column({ nullable: true })
   referencesSchemaId?: string;

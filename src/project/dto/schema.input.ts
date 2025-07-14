@@ -3,7 +3,7 @@ import { InputType, Field, ID } from '@nestjs/graphql';
 @InputType()
 export class Schema {
   @Field(() => ID)
-  projectDetailId: string;
+  fieldId: string;
 
   @Field()
   name: string;

@@ -13,6 +13,7 @@ import { DatabaseService } from './services/database.service';
 import { Schema } from './entities/schema.entity';
 import { ResourceService } from './services/resource.service';
 import { Fields } from './entities/fields.entity';
+import { SchemaResolver } from './resolver/schema.resolver';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Fields } from './entities/fields.entity';
     ProjectResolver,
     DynamicService,
     DynamicResolver,
+    SchemaResolver,
     SchemaService,
     DatabaseService,
     ResourceService,
