@@ -30,6 +30,7 @@ type ProjectDetails {
   dbType: String
   connectionUri: String
   liveUrl: String!
+  databaseName: String
   design: [Schema!]!
 }
 

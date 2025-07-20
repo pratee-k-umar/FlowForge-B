@@ -123,29 +123,27 @@ export class ProjectService {
       throw new NotFoundException('Project details not found');
     }
 
+    // Prevent creation if design already exists
     if (details.design && details.design.length > 0) {
-      const fieldsToRemove = details.design.flatMap((s) => s.fields || []);
-      await this.fieldRepo.remove(fieldsToRemove);
-      await this.schemaRepo.remove(details.design);
+      throw new ForbiddenException('Design already exists for this project');
     }
 
     const newSchemas: Schema[] = [];
     for (const table of design) {
-      const schema = this.schemaRepo.create({
+      const schema = await this.schemaRepo.save({
         name: table.name,
         projectDetail: details,
       });
 
-      (schema as any).fields = [];
-
+      const newFields: Fields[] = [];
       for (const field of table.fields) {
-        const newField = this.fieldRepo.create({
+        const newField = await this.fieldRepo.save({
           ...field,
           schema: schema,
         });
-        (schema as any).fields.push(newField);
+        newFields.push(newField);
       }
-
+      schema.fields = newFields;
       newSchemas.push(schema);
     }
 

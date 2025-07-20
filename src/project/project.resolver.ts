@@ -43,7 +43,7 @@ export class ProjectResolver {
 
   @Mutation(() => ProjectDetails, { name: 'createDesign' })
   @UseGuards(GqlJwtGaurd)
-  createDesign(
+  async createDesign(
     @Args('projectId') projectId: string,
     @Args('design', { type: () => GraphQLJSON }) design: any,
     @Context() { req },

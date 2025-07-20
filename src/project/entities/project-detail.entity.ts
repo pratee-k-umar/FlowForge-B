@@ -27,6 +27,10 @@ export class ProjectDetails {
   @Column()
   liveUrl: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  databaseName?: string;
+
   @Field(() => [Schema])
   @OneToMany(() => Schema, (schema) => schema.projectDetail, { cascade: true })
   @JoinColumn()
