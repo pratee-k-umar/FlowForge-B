@@ -23,6 +23,13 @@ export class SchemaService {
     private databaseService: DatabaseService,
   ) {}
 
+  private async _getDbName(userId: string, projectId: string) {
+    const project = await this.projectService.findByIdWithDetails(projectId);
+    if (project.owner.id !== userId) throw new ForbiddenException();
+    const dbName = project.name.toLowerCase().replace(/\s+/g, '_');
+    return { project, dbName };
+  }
+
   /**
    * Create a new schema (table) under a project and provision it in the database
    */
@@ -31,7 +38,7 @@ export class SchemaService {
     projectId: string,
     name: string,
   ): Promise<Schema> {
-    const project = await this.projectService.findByIdWithDetails(projectId);
+    const { project, dbName } = await this._getDbName(userId, projectId);
     if (project.owner.id !== userId) throw new ForbiddenException();
 
     const schema = this.schemaRepo.create({
@@ -40,7 +47,7 @@ export class SchemaService {
       fields: [],
     });
     const saved = await this.schemaRepo.save(schema);
-    await this.databaseService.provisionSchema(project.details);
+    await this.databaseService.provisionSchema(project.details, dbName);
     return saved;
   }
 
@@ -57,7 +64,7 @@ export class SchemaService {
     referencesSchemaId?: string,
     referencesField?: string,
   ): Promise<Fields> {
-    const project = await this.projectService.findByIdWithDetails(projectId);
+    const { project, dbName } = await this._getDbName(userId, projectId);
     if (project.owner.id !== userId) throw new ForbiddenException();
 
     const schema = await this.schemaRepo.findOne({ where: { id: schemaId } });
@@ -73,7 +80,7 @@ export class SchemaService {
     });
     const savedField = await this.fieldRepo.save(field);
 
-    await this.databaseService.provisionSchema(project.details);
+    await this.databaseService.provisionSchema(project.details, dbName);
     return savedField;
   }
 
@@ -117,7 +124,7 @@ export class SchemaService {
     projectId: string,
     schemaId: string,
   ): Promise<boolean> {
-    const project = await this.projectService.findByIdWithDetails(projectId);
+    const { project, dbName } = await this._getDbName(userId, projectId);
     if (project.owner.id !== userId) throw new ForbiddenException();
 
     const schema = await this.schemaRepo.findOne({
@@ -125,10 +132,14 @@ export class SchemaService {
     });
     if (!schema) throw new NotFoundException('Schema not found');
 
-    await this.databaseService.dropSchemaTable(project.details, schema.name);
+    await this.databaseService.dropSchemaTable(
+      project.details,
+      schema.name,
+      dbName,
+    );
 
     await this.schemaRepo.remove(schema);
-    await this.databaseService.provisionSchema(project.details);
+    await this.databaseService.provisionSchema(project.details, dbName);
     return true;
   }
 }

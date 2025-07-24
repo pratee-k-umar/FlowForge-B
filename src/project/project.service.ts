@@ -96,7 +96,8 @@ export class ProjectService {
     project.details.connectionUri = connectionUri;
     await this.detailsRepo.save(project.details);
 
-    await this.databaseService.provisionSchema(project.details);
+    const dbName = project.name.toLowerCase().replace(/\s+/g, '_');
+    await this.databaseService.provisionSchema(project.details, dbName);
 
     return project;
   }

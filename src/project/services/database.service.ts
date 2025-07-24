@@ -1,15 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { MongoClient } from 'mongodb';
+// import { MongoClient } from 'mongodb';
 import { ProjectDetails } from '../entities/project-detail.entity';
 import { Schema } from '../entities/schema.entity';
 import { Fields } from '../entities/fields.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import mongoose, { Connection } from 'mongoose';
 
 @Injectable()
 export class DatabaseService {
   private sqlDataSources = new Map<string, DataSource>();
-  private mongoClients = new Map<string, MongoClient>();
+  private mongoClients = new Map<string, Connection>();
 
   constructor(
     @InjectRepository(Schema)
@@ -19,16 +20,24 @@ export class DatabaseService {
   ) {}
 
   /** Get or create a connection for this projectId */
-  private async getConnection(projectId: string, details: ProjectDetails) {
+  private async getConnection(
+    projectId: string,
+    details: ProjectDetails,
+    dbName?: string,
+  ) {
     if (!details.connectionUri) throw new Error('No database configured');
 
     if (details.dbType === 'mongo') {
       if (!this.mongoClients.has(projectId)) {
-        const client = new MongoClient(details.connectionUri);
-        await client.connect();
-        this.mongoClients.set(projectId, client);
+        // const client = new MongoClient(details.connectionUri);
+        // await client.connect();
+        // this.mongoClients.set(projectId, client);
+        const connection = mongoose.createConnection(details.connectionUri, {
+          dbName: dbName,
+        });
+        this.mongoClients.set(projectId, connection);
       }
-      return this.mongoClients.get(projectId).db();
+      return this.mongoClients.get(projectId);
     }
     if (!this.sqlDataSources.has(projectId)) {
       const ds = new DataSource({
@@ -43,8 +52,8 @@ export class DatabaseService {
   }
 
   /** Loop through all TableSchemas and ColumnSchemas and create tables/collections */
-  async provisionSchema(details: ProjectDetails) {
-    const conn = await this.getConnection(details.id, details);
+  async provisionSchema(details: ProjectDetails, dbName?: string) {
+    const conn = await this.getConnection(details.id, details, dbName);
 
     // load schemas and their columns
     const tables = await this.tableRepo.find({
@@ -77,19 +86,16 @@ export class DatabaseService {
             if (!refTable)
               throw new NotFoundException('Referenced table schema not found');
             await qr.query(
-              `ALTER TABLE "${name}"
-               ADD CONSTRAINT fk_${name}_${f.name}
-               FOREIGN KEY ("${f.name}")
-               REFERENCES "${refTable.name}"("${f.referencesField}")
-               ON DELETE CASCADE;`,
+              `ALTER TABLE "${name}" ADD CONSTRAINT fk_${name}_${f.name} FOREIGN KEY ("${f.name}") REFERENCES "${refTable.name}"("${f.referencesField}") ON DELETE CASCADE;`,
             );
           }
         }
         await qr.release();
       } else {
         const db = conn;
-        const exists = await db.listCollections({ name }).toArray();
-        if (!exists.length) {
+        const collections = await db.listCollections();
+        const exists = collections.find((col: any) => col.name === name);
+        if (!exists) {
           await db.createCollection(name);
         }
       }
@@ -97,8 +103,12 @@ export class DatabaseService {
   }
 
   /** Drop a table/collection from a project's database */
-  async dropSchemaTable(details: ProjectDetails, tableName: string) {
-    const conn = await this.getConnection(details.id, details);
+  async dropSchemaTable(
+    details: ProjectDetails,
+    tableName: string,
+    dbName: string,
+  ) {
+    const conn = await this.getConnection(details.id, details, dbName);
 
     if (conn instanceof DataSource) {
       const qr = conn.createQueryRunner();
