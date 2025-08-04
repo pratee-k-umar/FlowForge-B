@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Schema } from './schema.entity';
+import { GraphQLJSONObject } from 'graphql-type-json';
 
 @ObjectType()
 @Entity({ name: 'project_details' })
@@ -39,4 +40,8 @@ export class ProjectDetails {
   // @OneToOne(() => Project, (p) => p.details, { onDelete: 'CASCADE' })
   // @JoinColumn()
   // project: Project;
+
+  @Field(() => GraphQLJSONObject, { nullable: true })
+  @Column({ type: 'json', nullable: true })
+  authConfig?: Record<string, any>;
 }

@@ -11,6 +11,9 @@ import { ProjectDetails } from './entities/project-detail.entity';
 import { DatabaseService } from './services/database.service';
 import { Schema } from './entities/schema.entity';
 import { Fields } from './entities/fields.entity';
+import { AuthConfigInput } from './dto/auth-config.input';
+import { ProjectAuth } from './entities/project-auth.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ProjectService {
@@ -20,8 +23,11 @@ export class ProjectService {
     private detailsRepo: Repository<ProjectDetails>,
     @InjectRepository(Schema) private schemaRepo: Repository<Schema>,
     @InjectRepository(Fields) private fieldRepo: Repository<Fields>,
+    @InjectRepository(ProjectAuth)
+    private projectAuthRepo: Repository<ProjectAuth>,
     private userService: UserService,
     private readonly databaseService: DatabaseService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async createProject(id: string, name: string): Promise<Project> {
@@ -153,5 +159,35 @@ export class ProjectService {
 
     await this.databaseService.provisionSchema(details);
     return saved;
+  }
+
+  async configureAuth(
+    userId: string,
+    projectid: string,
+    authConfig: AuthConfigInput,
+  ): Promise<ProjectDetails> {
+    const project = await this.projectRepo.findOne({
+      where: { id: projectid },
+      relations: ['details', 'owner', 'details.design'],
+    });
+
+    if (!project) throw new NotFoundException('Project not found');
+    if (project.owner.id !== userId) throw new ForbiddenException();
+
+    // const userSchema = project.details.design?.find(
+    //   (s) => s.name.toLowerCase() === 'user',
+    // );
+
+    // if (!userSchema)
+    //   throw new BadRequestException(
+    //     'Create useer schema before configuring auth',
+    //   );
+
+    project.details.authConfig = authConfig;
+    const savedDetails = await this.detailsRepo.save(project.details);
+
+    await this.databaseService.provisionProjectAuthSchema(savedDetails);
+
+    return savedDetails;
   }
 }

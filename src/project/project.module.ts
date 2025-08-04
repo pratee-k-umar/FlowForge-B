@@ -14,17 +14,37 @@ import { Schema } from './entities/schema.entity';
 import { ResourceService } from './services/resource.service';
 import { Fields } from './entities/fields.entity';
 import { SchemaResolver } from './resolver/schema.resolver';
+import { ProjectAuth } from './entities/project-auth.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { ProjectAuthService } from './services/project-auth.service';
 
 @Module({
   imports: [
     Project,
     ProjectDetails,
-    TypeOrmModule.forFeature([Project, ProjectDetails, Schema, Fields]),
+    TypeOrmModule.forFeature([
+      Project,
+      ProjectDetails,
+      Schema,
+      Fields,
+      ProjectAuth,
+    ]),
     UserModule,
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (cfg: ConfigService) => ({
+        secret: cfg.get<string>('USER_JWT_SECRET'),
+        signOptions: { expiresIn: '24h' },
+      }),
+    }),
   ],
   providers: [
     ProjectService,
     ProjectResolver,
+    ProjectAuthService,
     DynamicService,
     DynamicResolver,
     SchemaResolver,

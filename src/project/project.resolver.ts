@@ -6,6 +6,7 @@ import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
 import { DatabaseConfigInput, DbType } from './dto/database-config.input';
 import { ProjectDetails } from './entities/project-detail.entity';
 import GraphQLJSON from 'graphql-type-json';
+import { AuthConfigInput } from './dto/auth-config.input';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -55,4 +56,18 @@ export class ProjectResolver {
   // async getDetails(@Parent() project: Project): Promise<ProjectDetails> {
   //   return this.projectService.getProjectDetails(project.id);
   // }
+
+  @Mutation(() => Project, { name: 'setAuthConfig' })
+  @UseGuards(GqlJwtGaurd)
+  async setAuthConfig(
+    @Args('projectId') projectId: string,
+    @Args('authConfig') authConfig: AuthConfigInput,
+    @Context() { req },
+  ): Promise<ProjectDetails> {
+    return this.projectService.configureAuth(
+      req.user.id,
+      projectId,
+      authConfig,
+    );
+  }
 }

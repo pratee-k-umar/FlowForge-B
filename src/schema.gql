@@ -31,7 +31,13 @@ type ProjectDetails {
   connectionUri: String
   liveUrl: String!
   design: [Schema!]!
+  authConfig: JSONObject
 }
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
 
 type Project {
   id: ID!
@@ -44,6 +50,13 @@ type Project {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type SocialAuth {
+  googleId: String!
+  githubId: String!
+  xId: String!
+  microsoftId: String!
+}
 
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
@@ -68,6 +81,7 @@ type Mutation {
   createProject(name: String!): Project!
   setDatabaseConfig(projectId: String!, config: DatabaseConfigInput!): Project!
   createDesign(projectId: String!, design: JSON!): ProjectDetails!
+  setAuthConfig(projectId: String!, authConfig: AuthConfigInput!): Project!
   createRecord(projectId: ID!, entity: String!, data: JSON!): JSON!
   updateRecord(projectId: ID!, entity: String!, id: String!, data: JSON!): JSON!
   deleteRecord(projectId: ID!, entity: String!, id: String!): Boolean!
@@ -86,6 +100,34 @@ enum DbType {
   MONGO
   POSTGRES
   MYSQL
+}
+
+input AuthConfigInput {
+  emailPassword: EmailPasswordConfigInput
+  phone: PhoneConfigInput
+  google: OAuthConfigInput
+  github: OAuthConfigInput
+  x: OAuthConfigInput
+  microsoft: OAuthConfigInput
+}
+
+input EmailPasswordConfigInput {
+  enabled: Boolean!
+  enabledVerification: Boolean!
+}
+
+input PhoneConfigInput {
+  enabled: Boolean!
+  enabledVerification: Boolean!
+}
+
+input OAuthConfigInput {
+  enabled: Boolean!
+  clientId: String
+  clientSecret: String
+  authorizationUrl: String
+  tokenUrl: String
+  userInfoUrl: String
 }
 
 input FieldCRUDInput {

@@ -14,7 +14,7 @@ import { DynamicService } from '../services/dynamic.service';
 import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
 import { ProjectService } from '../project.service';
 
-@Controller('api/:projectId/:entity')
+@Controller('api/:projectId')
 @UseGuards(GqlJwtGaurd)
 export class DynamicRestController {
   constructor(

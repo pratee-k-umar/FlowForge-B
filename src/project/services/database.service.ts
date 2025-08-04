@@ -1,17 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 // import { MongoClient } from 'mongodb';
 import { ProjectDetails } from '../entities/project-detail.entity';
 import { Schema } from '../entities/schema.entity';
 import { Fields } from '../entities/fields.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import mongoose, { Connection } from 'mongoose';
+import mongoose, {
+  Connection,
+  Schema as MongooseSchema,
+  Model,
+} from 'mongoose';
+import { ProjectAuth } from '../entities/project-auth.entity';
 
 @Injectable()
 export class DatabaseService {
   private sqlDataSources = new Map<string, DataSource>();
   private mongoClients = new Map<string, Connection>();
-
+  private projectAuthMongooseSchema: MongooseSchema;
   constructor(
     @InjectRepository(Schema)
     private readonly tableRepo: Repository<Schema>,
@@ -24,6 +33,7 @@ export class DatabaseService {
     projectId: string,
     details: ProjectDetails,
     dbName?: string,
+    entities?: any[],
   ) {
     if (!details.connectionUri) throw new Error('No database configured');
 
@@ -44,6 +54,7 @@ export class DatabaseService {
         type: details.dbType as any,
         url: details.connectionUri,
         synchronize: false,
+        entities: entities,
       });
       await ds.initialize();
       this.sqlDataSources.set(projectId, ds);
@@ -122,5 +133,48 @@ export class DatabaseService {
         if (err.codeName !== 'NamespaceNotFound') throw err;
       }
     }
+  }
+
+  /**
+   * Dynamically gets a reopsitory for the projectAuth entity from the project's database
+   * Also ensures the ProjectAuth table is syncronized
+   */
+  async getProjectAuthRepository(
+    projectDetails: ProjectDetails,
+  ): Promise<Repository<ProjectAuth>> {
+    if (!projectDetails)
+      throw new BadRequestException('No databse configured for the project..!');
+
+    const conn = await this.getConnection(
+      projectDetails.id,
+      projectDetails,
+      undefined,
+      [ProjectAuth],
+    );
+
+    if (conn instanceof DataSource) {
+      await conn.synchronize(false);
+      return conn.getRepository(ProjectAuth);
+    } else if (conn instanceof mongoose.Connection) {
+      let projectAuthModel = Model<ProjectAuth>;
+      try {
+        projectAuthModel = conn.model<ProjectAuth>('ProjectAuth');
+      } catch (error) {
+        projectAuthModel = conn.model<ProjectAuth>(
+          'ProjectAuth',
+          this.projectAuthMongooseSchema,
+        );
+      }
+      return projectAuthModel as unknown as Repository<ProjectAuth>;
+    } else throw new BadRequestException('Unsupported database type');
+  }
+
+  /**
+   * Provision the ProjectAuth schema (table/collection) in the developer's database
+   */
+  async provisionProjectAuthSchema(
+    projectDetails: ProjectDetails,
+  ): Promise<void> {
+    await this.getProjectAuthRepository(projectDetails);
   }
 }
