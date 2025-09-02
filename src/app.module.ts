@@ -54,7 +54,7 @@ import GraphQLJSON from 'graphql-type-json';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(ProjectMiddleware).forRoutes({
-      path: 'api/:projectId/graphql',
+      path: 'api/:projectId',
       method: RequestMethod.ALL,
     });
   }

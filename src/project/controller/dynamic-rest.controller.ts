@@ -1,76 +1,52 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { All, Body, Controller, Req } from '@nestjs/common';
 import { DynamicService } from '../services/dynamic.service';
-import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
-import { ProjectService } from '../project.service';
+import { ProjectAuthService } from '../services/project-auth.service';
+import { ProjectApiInput } from '../dto/project-api.input';
+
+type ActionHandler = (
+  projectId: string,
+  entityName: string,
+  payload: any,
+) => Promise<any>;
 
 @Controller('api/:projectId')
-@UseGuards(GqlJwtGaurd)
 export class DynamicRestController {
+  private readonly actionHandlers: Map<string, ActionHandler>;
   constructor(
     private readonly dynamicService: DynamicService,
-    private readonly projectService: ProjectService,
-  ) {}
-
-  @Get()
-  async findAll(@Req() req: Request, @Param('entity') entity: string) {
-    const projectDetails = (req as any).projectDetails;
-    if (!projectDetails) throw new NotFoundException('Project not found');
-    return this.dynamicService.findAll(projectDetails, entity);
+    private readonly projectAuthService: ProjectAuthService,
+  ) {
+    this.actionHandlers = new Map<string, ActionHandler>([
+      ['find_all', this.dynamicService.findAll.bind(this.dynamicService)],
+      ['find_one', this.dynamicService.findOne.bind(this.dynamicService)],
+      ['create', this.dynamicService.create.bind(this.dynamicService)],
+      ['update', this.dynamicService.update.bind(this.dynamicService)],
+      ['delete', this.dynamicService.delete.bind(this.dynamicService)],
+    ]);
   }
 
-  @Get(':id')
-  async findOne(
-    @Req() req: Request,
-    @Param('entity') entity: string,
-    @Param('id') id: string,
-  ) {
+  @All('*')
+  async handleRequests(@Req() req: Request, @Body() body: any) {
     const projectDetails = (req as any).projectDetails;
-    if (!projectDetails) throw new NotFoundException('Project not found');
-    return this.dynamicService.findOne(projectDetails, entity, id);
-  }
+    // if (!projectDetails || !projectDetails.endpoints) {
+    //   throw new Error('Project or Enpoints not configured..!');
+    // }
 
-  @Post()
-  async create(
-    @Req() req: Request,
-    @Param('entity') entity: string,
-    @Body() body: any,
-  ) {
-    const projectDetails = (req as any).projectDetails;
-    if (!projectDetails) throw new NotFoundException('Project not found');
-    return this.dynamicService.create(projectDetails, entity, body);
-  }
+    const method = req.method.toUpperCase();
+    const path =
+      (req as any).url.replace(`/api/${projectDetails.id}`, '') || '/';
 
-  @Put(':id')
-  async update(
-    @Req() req: Request,
-    @Param('entity') entity: string,
-    @Param('id') id: string,
-    @Body() body: any,
-  ) {
-    const projectDetails = (req as any).projectDetails;
-    if (!projectDetails) throw new NotFoundException('Project not found');
-    return this.dynamicService.update(projectDetails, entity, id, body);
-  }
+    const endPoint = projectDetails.endpoints.find(
+      (ep: ProjectApiInput) =>
+        ep.path === path && ep.method === method && ep.isRequired,
+    );
 
-  @Delete(':id')
-  async remove(
-    @Req() req: Request,
-    @Param('entity') entity: string,
-    @Param('id') id: string,
-  ) {
-    const projectDetails = (req as any).projectDetails;
-    if (!projectDetails) throw new NotFoundException('Project not found');
-    return this.dynamicService.delete(projectDetails, entity, id);
+    if (!endPoint) throw new Error(`No endpoint found for ${method} ${path}`);
+
+    const action = this.actionHandlers.get(endPoint.action);
+    if (!action)
+      throw new Error(`No action handler found for ${endPoint.action}`);
+
+    return action(projectDetails.id, endPoint.targetEntity, body);
   }
 }
