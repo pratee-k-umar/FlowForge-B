@@ -88,7 +88,7 @@ export class ProjectService {
   async setDatabaseConfig(
     userId: string,
     projectId: string,
-    dbType: 'mongo' | 'postgres' | 'mysql',
+    dbType: 'mongodb' | 'postgres' | 'mysql',
     connectionUri: string,
   ): Promise<Project> {
     const project = await this.projectRepo.findOne({

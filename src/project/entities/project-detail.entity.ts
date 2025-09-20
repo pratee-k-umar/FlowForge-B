@@ -18,7 +18,7 @@ export class ProjectDetails {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  dbType?: 'mongo' | 'postgres' | 'mysql';
+  dbType?: 'mongodb' | 'postgres' | 'mysql';
 
   @Field({ nullable: true })
   @Column({ nullable: true })

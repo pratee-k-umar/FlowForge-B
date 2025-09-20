@@ -37,7 +37,7 @@ export class DatabaseService {
   ) {
     if (!details.connectionUri) throw new Error('No database configured');
 
-    if (details.dbType === 'mongo') {
+    if (details.dbType === 'mongodb') {
       if (!this.mongoClients.has(projectId)) {
         // const client = new MongoClient(details.connectionUri);
         // await client.connect();

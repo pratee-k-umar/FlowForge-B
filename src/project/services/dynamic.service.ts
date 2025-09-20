@@ -5,16 +5,18 @@ import {
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { ResourceService } from './resource.service';
+import { ConnectionManager } from './connection.manager';
 
 @Injectable()
 export class DynamicService {
   constructor(
     private readonly resourceService: ResourceService,
     private readonly dataSource: DataSource,
+    private readonly connectionManager: ConnectionManager,
   ) {}
 
   /** Helper: get the TypeORM repository for a given entity/table name */
-  private getRepo(entityName: string): Repository<any> {
+  private getRepo(dataSource: DataSource, entityName: string): Repository<any> {
     const meta = this.dataSource.entityMetadatas.find(
       (m) => m.tableName === entityName,
     );
@@ -32,7 +34,8 @@ export class DynamicService {
       projectId,
       entityName,
     );
-    const repo = this.getRepo(resource.name);
+    const connection = await this.connectionManager.getConnection(projectId);
+    const repo = this.getRepo(connection, resource.name);
     return repo.find();
   }
 
@@ -46,7 +49,8 @@ export class DynamicService {
       projectId,
       entityName,
     );
-    const repo = this.getRepo(resource.name);
+    const connection = await this.connectionManager.getConnection(projectId);
+    const repo = this.getRepo(connection, resource.name);
     const record = await repo.findOne({ where: { id } });
     if (!record) {
       throw new NotFoundException(`${entityName} with id ${id} not found`);
@@ -76,7 +80,8 @@ export class DynamicService {
         validData[key] = data[key];
       }
     }
-    const repo = this.getRepo(resource.name);
+    const connection = await this.connectionManager.getConnection(projectId);
+    const repo = this.getRepo(connection, resource.name);
     const entity = repo.create(validData);
     return repo.save(entity);
   }
@@ -106,7 +111,8 @@ export class DynamicService {
         'Update data contains no valid fields for this entity or all values are undefined.',
       );
     }
-    const repo = this.getRepo(resource.name);
+    const connection = await this.connectionManager.getConnection(projectId);
+    const repo = this.getRepo(connection, resource.name);
     await repo.update(id, validData);
     const updated = await repo.findOne({ where: { id } });
     if (!updated) {
@@ -125,7 +131,8 @@ export class DynamicService {
       projectId,
       entityName,
     );
-    const repo = this.getRepo(resource.name);
+    const connection = await this.connectionManager.getConnection(projectId);
+    const repo = this.getRepo(connection, resource.name);
     const result = await repo.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`${entityName} with id ${id} not found`);

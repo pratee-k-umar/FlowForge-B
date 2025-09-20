@@ -18,6 +18,7 @@ import { ProjectAuth } from './entities/project-auth.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { ProjectAuthService } from './services/project-auth.service';
+import { ConnectionManager } from './services/connection.manager';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { ProjectAuthService } from './services/project-auth.service';
     SchemaService,
     DatabaseService,
     ResourceService,
+    ConnectionManager,
   ],
   controllers: [DynamicRestController],
   exports: [ProjectService],

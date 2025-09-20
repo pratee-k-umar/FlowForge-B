@@ -1,7 +1,7 @@
 import { InputType, Field, registerEnumType } from '@nestjs/graphql';
 
 export enum DbType {
-  MONGO = 'mongo',
+  MONGO = 'mongodb',
   POSTGRES = 'postgres',
   MYSQL = 'mysql',
 }
