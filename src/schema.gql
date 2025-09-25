@@ -2,14 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
-  id: ID!
-  name: String!
-  email: String!
-  isVerified: Boolean!
-  roles: [String!]!
-}
-
 type Fields {
   id: ID!
   name: String!
@@ -51,6 +43,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  isVerified: Boolean!
+  roles: [String!]!
+  project: [Project!]!
+}
+
 type SocialAuth {
   googleId: String!
   githubId: String!
@@ -66,7 +67,8 @@ scalar JSON
 type Query {
   flowforge: String!
   me: User!
-  projects: [Project!]!
+  project: [Project!]!
+  details(projectId: String!): ProjectDetails!
   getRecords(projectId: ID!, entity: String!): [JSON!]!
   getRecord(projectId: ID!, entity: String!, id: String!): JSON!
 }

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Schema } from './schema.entity';
 import { GraphQLJSONObject } from 'graphql-type-json';
+import { ProjectApi } from './project-api.entity';
 
 @ObjectType()
 @Entity({ name: 'project_details' })
@@ -44,4 +45,7 @@ export class ProjectDetails {
   @Field(() => GraphQLJSONObject, { nullable: true })
   @Column({ type: 'json', nullable: true })
   authConfig?: Record<string, any>;
+
+  @OneToMany(() => ProjectApi, (api) => api.projectDetail, { cascade: true })
+  api: ProjectApi[];
 }

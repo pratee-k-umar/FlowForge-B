@@ -1,6 +1,14 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Project } from 'src/project/project.entity';
 
 @ObjectType()
 @Entity()
@@ -23,7 +31,6 @@ export class User {
   @Field()
   @Column({ default: false })
   isVerified: boolean;
-  projects: any;
 
   @BeforeInsert()
   async hashPassword() {
@@ -33,4 +40,9 @@ export class User {
   @Field(() => [String])
   @Column('text', { array: true, default: () => "ARRAY['user']" })
   roles: string[];
+
+  @Field(() => [Project])
+  @OneToMany(() => Project, (project) => project.owner)
+  @JoinColumn()
+  project: Project[];
 }

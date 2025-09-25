@@ -1,7 +1,15 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { Project } from './project.entity';
 import { ProjectService } from './project.service';
-import { UseGuards } from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import { GqlJwtGaurd } from 'src/auth/gql-jwt.gaurd';
 import { DatabaseConfigInput, DbType } from './dto/database-config.input';
 import { ProjectDetails } from './entities/project-detail.entity';
@@ -12,10 +20,22 @@ import { AuthConfigInput } from './dto/auth-config.input';
 export class ProjectResolver {
   constructor(private projectService: ProjectService) {}
 
-  @Query(() => [Project], { name: 'projects' })
+  @Query(() => [Project], { name: 'project' })
   @UseGuards(GqlJwtGaurd)
   async projects(@Context() { req }): Promise<Project[]> {
     return this.projectService.findByUser(req.user.id);
+  }
+
+  @Query(() => ProjectDetails, { name: 'details' })
+  @UseGuards(GqlJwtGaurd)
+  async projectDetails(
+    @Args('projectId') projectId: string,
+    @Context() { req },
+  ): Promise<ProjectDetails> {
+    const project = await this.projectService.findById(projectId);
+    if (project.owner.id !== req.user.id)
+      throw new ForbiddenException('Unauthroized..!');
+    return this.projectService.getProjectDetails(projectId);
   }
 
   @Mutation(() => Project)
@@ -52,10 +72,10 @@ export class ProjectResolver {
     return this.projectService.createDesign(req.user.id, projectId, design);
   }
 
-  // @ResolveField('details', () => ProjectDetails)
-  // async getDetails(@Parent() project: Project): Promise<ProjectDetails> {
-  //   return this.projectService.getProjectDetails(project.id);
-  // }
+  @ResolveField('details', () => ProjectDetails)
+  async getDetails(@Parent() project: Project): Promise<ProjectDetails> {
+    return this.projectService.getProjectDetails(project.id);
+  }
 
   @Mutation(() => Project, { name: 'setAuthConfig' })
   @UseGuards(GqlJwtGaurd)

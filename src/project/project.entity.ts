@@ -26,11 +26,11 @@ export class Project {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.projects, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.project, { onDelete: 'CASCADE' })
   owner: User;
 
   @Field(() => ProjectDetails)
-  @OneToOne(() => ProjectDetails, { cascade: true, eager: true })
+  @OneToOne(() => ProjectDetails, { cascade: true })
   @JoinColumn()
   details: ProjectDetails;
 
