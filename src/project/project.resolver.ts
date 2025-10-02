@@ -26,7 +26,7 @@ export class ProjectResolver {
     return this.projectService.findByUser(req.user.id);
   }
 
-  @Query(() => ProjectDetails, { name: 'details' })
+  @Query(() => ProjectDetails, { name: 'projectDetails' })
   @UseGuards(GqlJwtGaurd)
   async projectDetails(
     @Args('projectId') projectId: string,

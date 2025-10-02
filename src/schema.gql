@@ -68,7 +68,7 @@ type Query {
   flowforge: String!
   me: User!
   project: [Project!]!
-  details(projectId: String!): ProjectDetails!
+  projectDetails(projectId: String!): ProjectDetails!
   getRecords(projectId: ID!, entity: String!): [JSON!]!
   getRecord(projectId: ID!, entity: String!, id: String!): JSON!
 }
