@@ -13,7 +13,6 @@ import { Schema } from './entities/schema.entity';
 import { Fields } from './entities/fields.entity';
 import { AuthConfigInput } from './dto/auth-config.input';
 import { ProjectAuth } from './entities/project-auth.entity';
-import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ProjectService {
@@ -24,10 +23,8 @@ export class ProjectService {
     @InjectRepository(Schema) private schemaRepo: Repository<Schema>,
     @InjectRepository(Fields) private fieldRepo: Repository<Fields>,
     @InjectRepository(ProjectAuth)
-    private projectAuthRepo: Repository<ProjectAuth>,
     private userService: UserService,
     private readonly databaseService: DatabaseService,
-    private readonly jwtService: JwtService,
   ) {}
 
   async createProject(id: string, name: string): Promise<Project> {
@@ -160,6 +157,16 @@ export class ProjectService {
 
     await this.databaseService.provisionSchema(details);
     return saved;
+  }
+
+  async getSchema(projectId: string): Promise<Schema[]> {
+    const project = await this.findById(projectId);
+    if (!project) throw new NotFoundException('Project not found..!');
+
+    return this.schemaRepo.find({
+      where: { projectDetail: { id: project.details.id } },
+      relations: ['fields'],
+    });
   }
 
   async configureAuth(
