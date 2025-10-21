@@ -1,4 +1,4 @@
-import { Field, ID } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
@@ -7,7 +7,16 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProjectDetails } from './project-detail.entity';
+import { GraphQLJSONObject } from 'graphql-type-json';
 
+export enum ApiMethod {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+}
+
+@ObjectType()
 @Entity({ name: 'project-api' })
 export class ProjectApi {
   @Field(() => ID)
@@ -22,17 +31,17 @@ export class ProjectApi {
 
   @Field()
   @Column()
-  name: string;
+  path: string;
 
   @Field()
   @Column()
-  route: string;
+  method: ApiMethod;
 
   @Field()
   @Column()
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  targetEntity: string;
 
-  @Field()
+  @Field(() => GraphQLJSONObject)
   @Column({ type: 'jsonb' })
-  function: string;
+  data: Record<string, any>;
 }

@@ -1,8 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, EntitySchema } from 'typeorm';
 import { ProjectService } from '../project.service';
 import { ProjectDetails } from '../entities/project-detail.entity';
+import { Fields } from '../entities/fields.entity';
 
+const mapColumnType = (type: string): any => {
+  switch (type) {
+    case 'string':
+      return 'varchar';
+    case 'number':
+      return 'int';
+    case 'boolean':
+      return 'boolean';
+    default:
+      return 'text';
+  }
+};
 @Injectable()
 export class ConnectionManager {
   private connection: Map<string, DataSource> = new Map();
@@ -15,13 +28,31 @@ export class ConnectionManager {
       await this.projectService.getProjectDetails(projectId);
 
     if (!projectDetails || !projectDetails.connectionUri)
-      throw new NotFoundException('Database not configured for the project..!');
+      throw new NotFoundException('Project details not found');
+
+    const resources = await this.projectService.getSchema(projectId);
+
+    const dynamicEntities = resources.map((resource) => {
+      const columns = {};
+      resource.fields.forEach((field: Fields) => {
+        columns[field.name] = {
+          type: mapColumnType(field.type),
+          primary: field.name === 'id',
+          generatedKey: field.name === 'id' ? 'uuid' : false,
+        };
+      });
+      return new EntitySchema({
+        name: resource.name,
+        tableName: resource.name,
+        columns,
+      });
+    });
 
     const newConnection = new DataSource({
       type: projectDetails.dbType,
       url: projectDetails.connectionUri,
-      entities: [],
-      synchronize: true,
+      entities: dynamicEntities,
+      synchronize: false,
     });
 
     await newConnection.initialize();

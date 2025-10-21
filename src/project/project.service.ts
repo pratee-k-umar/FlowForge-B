@@ -13,6 +13,9 @@ import { Schema } from './entities/schema.entity';
 import { Fields } from './entities/fields.entity';
 import { AuthConfigInput } from './dto/auth-config.input';
 import { ProjectAuth } from './entities/project-auth.entity';
+import { ProjectApi } from './entities/project-api.entity';
+import { ProjectApiInput } from './dto/project-api.input';
+import { UpdateApi } from './dto/update-api.input';
 
 @Injectable()
 export class ProjectService {
@@ -23,6 +26,8 @@ export class ProjectService {
     @InjectRepository(Schema) private schemaRepo: Repository<Schema>,
     @InjectRepository(Fields) private fieldRepo: Repository<Fields>,
     @InjectRepository(ProjectAuth)
+    @InjectRepository(ProjectApi)
+    private projectApiRepo: Repository<ProjectApi>,
     private userService: UserService,
     private readonly databaseService: DatabaseService,
   ) {}
@@ -167,6 +172,72 @@ export class ProjectService {
       where: { projectDetail: { id: project.details.id } },
       relations: ['fields'],
     });
+  }
+
+  async createApi(
+    userId: string,
+    projectId: string,
+    apiInput: ProjectApiInput,
+  ): Promise<ProjectApi> {
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+      relations: ['details', 'owner'],
+    });
+
+    if (!project) throw new NotFoundException('Project not found..!');
+
+    if (project.owner.id !== userId)
+      throw new ForbiddenException('Unauthorized..!');
+
+    const newApi = this.projectApiRepo.create({
+      projectDetail: project.details,
+      path: apiInput.path,
+      method: apiInput.method,
+      targetEntity: apiInput.targetEntity,
+      data: apiInput.data,
+    });
+
+    return this.projectApiRepo.save(newApi);
+  }
+
+  async getApi(userId: string, projectId: string): Promise<ProjectApi[]> {
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+      relations: ['details', 'owner'],
+    });
+
+    if (!project) throw new NotFoundException('Project not found..!');
+
+    if (project.owner.id !== userId)
+      throw new ForbiddenException('Unauthorized..!');
+
+    return this.projectApiRepo.find({
+      where: { projectDetail: { id: project.details.id } },
+    });
+  }
+
+  async updateApi(
+    userId: string,
+    apiId: string,
+    updateInput: UpdateApi,
+  ): Promise<ProjectApi> {
+    const api = await this.projectApiRepo.findOne({
+      where: { id: apiId },
+      relations: ['projectDetail', 'owner'],
+    });
+
+    if (!api) throw new NotFoundException('API not found..!');
+
+    if (api.projectDetail.owner.id !== userId)
+      throw new ForbiddenException('Unauthorized..!');
+
+    const { path, method, targetEntity, data } = updateInput;
+    const updatePayload: Partial<ProjectApi> = {};
+
+    if (path) updatePayload.path = path;
+    if (method) updatePayload.method = method;
+    if (targetEntity) updatePayload.targetEntity = targetEntity;
+    if (data) updatePayload.data = data;
   }
 
   async configureAuth(

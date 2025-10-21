@@ -15,6 +15,8 @@ import { DatabaseConfigInput, DbType } from './dto/database-config.input';
 import { ProjectDetails } from './entities/project-detail.entity';
 import GraphQLJSON from 'graphql-type-json';
 import { AuthConfigInput } from './dto/auth-config.input';
+import { ProjectApi } from './entities/project-api.entity';
+import { ProjectApiInput } from './dto/project-api.input';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -36,6 +38,15 @@ export class ProjectResolver {
     if (project.owner.id !== req.user.id)
       throw new ForbiddenException('Unauthroized..!');
     return this.projectService.getProjectDetails(projectId);
+  }
+
+  @Query(() => ProjectApi, { name: 'getApi' })
+  @UseGuards(GqlJwtGaurd)
+  async getApi(
+    @Args('projectId') projectId: string,
+    @Context() { req },
+  ): Promise<ProjectApi[]> {
+    return this.projectService.getApi(req.user.id, projectId);
   }
 
   @Mutation(() => Project)
@@ -75,6 +86,16 @@ export class ProjectResolver {
   @ResolveField('details', () => ProjectDetails)
   async getDetails(@Parent() project: Project): Promise<ProjectDetails> {
     return this.projectService.getProjectDetails(project.id);
+  }
+
+  @Mutation(() => ProjectApi, { name: 'createApi' })
+  @UseGuards(GqlJwtGaurd)
+  async createApi(
+    @Args('projectId') projectId: string,
+    @Args('apiInput') apiInput: ProjectApiInput,
+    @Context() { req },
+  ): Promise<ProjectApi> {
+    return this.projectService.createApi(req.user.id, projectId, apiInput);
   }
 
   @Mutation(() => Project, { name: 'setAuthConfig' })

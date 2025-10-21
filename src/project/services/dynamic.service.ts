@@ -17,8 +17,8 @@ export class DynamicService {
 
   /** Helper: get the TypeORM repository for a given entity/table name */
   private getRepo(dataSource: DataSource, entityName: string): Repository<any> {
-    const meta = this.dataSource.entityMetadatas.find(
-      (m) => m.tableName === entityName,
+    const meta = dataSource.entityMetadatas.find(
+      (m) => m.tableName === entityName || m.name === entityName,
     );
     if (!meta) {
       throw new BadRequestException(
